@@ -29,28 +29,53 @@
 
 define('MAPS_API_KEY', 'AIzaSyDVCGFuZZWzA2lgRQztNEJExpiRDCzaj0A');
 
-function load_google_maps_api() {
-	echo "<script type='text/javascript'" 
-			."src='https://maps.googleapis.com/maps/api/js?key=".MAPS_API_KEY."&sensor=FALSE'>"
-		."</script>";
-}
+//http://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&sensor=true_or_false
+function init_js_and_css_files() {
 
-add_action( 'muplugins_loaded', 'load_google_maps_api' );
+	wp_register_script( 'google', "https://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=true" );
+	wp_enqueue_script( 'google' );
+
+	wp_register_script( 'geoxml', plugins_url('geoxml.js', __FILE__) );
+	wp_enqueue_script( 'geoxml' );
+
+
+	wp_register_script( 'geo_incentives', plugins_url('geo_incentives.js', __FILE__) );
+	wp_enqueue_script( 'geo_incentives' );
+
+
+}
+add_action('init', 'init_js_and_css_files');
+
 
 //[geo_incentives]
 function start_geo_incentives() {
+	$json = array();
 	
 	//if there are any request params then show the form
 	if(isset($_REQUEST['address'])) {
-		//get lat and lon for address 
-		//var userLocation = new google.maps.LatLng(44.928633,-93.298919);
+		$files = array(plugins_url("kml/file1.kml", __FILE__));
 
-		// var userMarker = new google.maps.Marker({
-  //           position: userLocation,
-  //           map: map,
-  //           title:"Your Location",
-  //           draggable: true
-  //       });
+		foreach($files as $file) {
+			$xml = simplexml_load_file($file);
+	        $childs = $xml->Document->Folder->children();
+	        foreach ($childs as $child)
+	        {
+	            $coords = $child->MultiGeometry->Polygon->outerBoundaryIs->LinearRing->coordinates[0][0];
+	            break;
+	            
+	        }
+		}
+
+		$files = json_encode($files);
+
+
+
+?>
+
+	<div id='map-canvas' style="display:none;"></div>
+	<script>codeAddress(<?php echo "'{$_REQUEST['address']}'"; ?>, <?php echo $files; ?>);</script>
+
+<?php
 
 
 		//foreach loop through all of the files
@@ -75,14 +100,25 @@ function start_geo_incentives() {
 
 
 
-	} else {
-		//create form to get address
-		$current_page_url = get_permalink();
-		echo "<form action='{$current_page_url}' method='POST'>"
-				."<div><input name='address' type='' placeholder='Address'/><br><br>"
-				."<input type='submit' value='submit'/></div>"
-			."</form>";
 	}
+	
+	//create form to get address
+	$current_page_url = get_permalink();
+	echo "<form action='{$current_page_url}' method='POST'>"
+			."<div><input name='address' type='' placeholder='Address'/><br><br>"
+			."<input type='submit' value='submit'/></div>"
+		."</form><div id='result_text'></div>";
+
+	if(isset($_REQUEST['address'])) {
+		if(strstr($_REQUEST['address'], 'atlanta') || strstr($_REQUEST['address'], 'buckhead')) {
+			echo "<br><br><p style=''>Currently there are tax credits available in your.</p>";
+			echo "<a href='http://www.investatlanta.com'>More information</a>";
+		} else {
+			echo "<br><br><p style=''>Currently no tax credits for your area.</p>";
+			echo "<a href='http://www.investatlanta.com'>Contact Invest Atlanta</a>";
+		}
+	}
+
 
 }
 

@@ -21,27 +21,16 @@ function mt_tools_page() {
 
     if(isset($_POST['text_result']) && isset($_POST['text_link']) && isset($_FILES['datafile'])) {
         
-        $xml = simplexml_load_file($_FILES['datafile']['tmp_name']);
-        $childs = $xml->Document->Folder->children();
-        foreach ($childs as $child)
-        {
-            print_r($child->MultiGeometry->Polygon->outerBoundaryIs->LinearRing->coordinates);
-
-        }
-
-
-
-
-
-        // $target_path = "kml/";
-
-        // $target_path = $target_path . $_FILES['datafile']['name']; 
-        // if(move_uploaded_file($_FILES['datafile']['tmp_name'], $target_path)) {
-        //     echo "<h3 style='color: green;'>The file ".  $_FILES['datafile']['name']. 
-        //     " has been uploaded.</h3>";
-        // } else{
-        //     echo "<h3 style='color: red;'>There was an error uploading the file, please try again!</h3>";
+        // $xml = simplexml_load_file($_FILES['datafile']['tmp_name']);
+        // $childs = $xml->Document->Folder->children();
+        // foreach ($childs as $child)
+        // {
+        //     print_r($child->MultiGeometry->Polygon->outerBoundaryIs->LinearRing->coordinates);
         // }
+
+        define('TEXT_RESULT', $_POST['text_result']);
+        define('TEXT_LINK', $_POST['text_link']);
+        echo '<h3 style="color: green;">File uploaded.</h3>';
 
     }
 ?>
