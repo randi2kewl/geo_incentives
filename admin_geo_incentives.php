@@ -21,13 +21,6 @@ function mt_tools_page() {
 
     if(isset($_POST['text_result']) && isset($_POST['text_link']) && isset($_FILES['datafile'])) {
         
-        // $xml = simplexml_load_file($_FILES['datafile']['tmp_name']);
-        // $childs = $xml->Document->Folder->children();
-        // foreach ($childs as $child)
-        // {
-        //     print_r($child->MultiGeometry->Polygon->outerBoundaryIs->LinearRing->coordinates);
-        // }
-
         define('TEXT_RESULT', $_POST['text_result']);
         define('TEXT_LINK', $_POST['text_link']);
         echo '<h3 style="color: green;">File uploaded.</h3>';

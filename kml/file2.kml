@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>FiberPhase1.kml</name>
+	<Style id="lineStylePhase1">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<LineStyle>
+			<color>bf54ff2d</color>
+		</LineStyle>
+		<PolyStyle>
+			<color>5440ff65</color>
+		</PolyStyle>
+	</Style>
+	<Placemark>
+		<name>Phase1</name>
+		<styleUrl>#lineStylePhase1</styleUrl>
+		<Polygon>
+			<tessellate>1</tessellate>
+			<outerBoundaryIs>
+				<LinearRing>
+					<coordinates>
+						-93.32939163006991,44.91049963680437,0 -93.31824742787862,44.91049403648244,0 -93.31822429025756,44.91264231259666,0 -93.32939980225274,44.91275508995863,0 -93.32939163006991,44.91049963680437,0 
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+		</Polygon>
+	</Placemark>
+</Document>
+</kml>

@@ -27,27 +27,28 @@
 
  include('admin_geo_incentives.php');
 
-define('MAPS_API_KEY', 'AIzaSyDVCGFuZZWzA2lgRQztNEJExpiRDCzaj0A');
+/*
+	Initialize  JS and Google Maps 
 
-//http://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&sensor=true_or_false
+*/
 function init_js_and_css_files() {
 
-	wp_register_script( 'google', "https://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=true" );
+	wp_register_script( 'google', "https://maps.googleapis.com/maps/api/js?libraries=geometry,visualization&sensor=false&v=3&key=AIzaSyDVCGFuZZWzA2lgRQztNEJExpiRDCzaj0A" );
 	wp_enqueue_script( 'google' );
 
-	wp_register_script( 'geoxml', plugins_url('geoxml.js', __FILE__) );
-	wp_enqueue_script( 'geoxml' );
-
+	wp_register_script( 'jquery', "//code.jquery.com/jquery-1.10.2.min.js" );
+	wp_enqueue_script( 'jquery' );
 
 	wp_register_script( 'geo_incentives', plugins_url('geo_incentives.js', __FILE__) );
 	wp_enqueue_script( 'geo_incentives' );
+} 
 
-
-}
 add_action('init', 'init_js_and_css_files');
 
 
-//[geo_incentives]
+/*
+	Starts the plugin 
+*/
 function start_geo_incentives() {
 	$json = array();
 	
@@ -58,47 +59,24 @@ function start_geo_incentives() {
 		foreach($files as $file) {
 			$xml = simplexml_load_file($file);
 	        $childs = $xml->Document->Folder->children();
+
+	        // Cycle through each of the polygon containers
 	        foreach ($childs as $child)
 	        {
 	            $coords = $child->MultiGeometry->Polygon->outerBoundaryIs->LinearRing->coordinates[0][0];
+	            var_dump($coords);
 	            break;
 	            
 	        }
 		}
 
 		$files = json_encode($files);
-
-
-
 ?>
 
-	<div id='map-canvas' style="display:none;"></div>
-	<script>codeAddress(<?php echo "'{$_REQUEST['address']}'"; ?>, <?php echo $files; ?>);</script>
+	<div id='map-canvas' style="width: 800px; height: 800px;"></div>
+	<script>addy=<?php echo "'{$_REQUEST['address']}'"; ?>; files=<?php echo $files; ?>;</script>
 
 <?php
-
-
-		//foreach loop through all of the files
-			//parse the kml to get the coordinates
-
-			//create the polygon
-
-
-
-			//find out if the marker is in the polygon
- 			//var markerOut = google.maps.geometry.poly.containsLocation(userMarker.getPosition(), polySector3PillburyPleasant);
-
-			// console.log(markerOut);
-
-			//if inside then stop looking else continue
-
-				//display found result text and link
-
-		//if still not in an area then show not found text and link
-
-
-
-
 
 	}
 	
