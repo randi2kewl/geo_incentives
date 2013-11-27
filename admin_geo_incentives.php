@@ -19,12 +19,26 @@ function mt_tools_page() {
       wp_die( __('You do not have sufficient permissions to access this page.') );
     }
 
-    if(isset($_POST['text_result']) && isset($_POST['text_link']) && isset($_FILES['datafile'])) {
-        
-        define('TEXT_RESULT', $_POST['text_result']);
-        define('TEXT_LINK', $_POST['text_link']);
-        echo '<h3 style="color: green;">File uploaded.</h3>';
+    if(isset($_REQUEST['text_result']) && isset($_REQUEST['text_link']) && isset($_FILES['datafile'])) {
 
+        $file_options = get_option('geo_incentive_files');
+        $file_options[ $_FILES['datafile']['name'] ] = array(
+            'url'=>plugins_url().'/geoincentives/kml/'.$_FILES['datafile']['name'],
+            'text'=>$_REQUEST['text_result'], 
+            'link'=>$_REQUEST['text_link']
+        );
+
+        $moved = move_uploaded_file($_FILES['datafile']['tmp_name'], dirname(__FILE__)."/kml/".$_FILES['datafile']['name']);
+
+        if($moved) {
+            update_option('geo_incentive_files', $file_options);
+            echo '<h3 style="color: green;">File uploaded.</h3>';
+        } else {
+            echo '<h3 style="color: red;">Error uploading file.</h3>';
+        }
+    } else if(isset($_REQUEST['no_result'])) {
+        update_option('geo_no_result', $_REQUEST['no_result']);
+        echo '<h3 style="color: green;">Text was saved.</h3>';
     }
 ?>
     <!-- File upload form -->
@@ -37,7 +51,7 @@ function mt_tools_page() {
 
         <p>
             Result Link:
-            <input type="text" name="text_link" />
+            <input type="text" name="text_link" value="http://"/>
         </p>   
         <p>
             Upload KML file: 
@@ -49,6 +63,16 @@ function mt_tools_page() {
     </form>
 
     <hr>
+
+    <form name="no_result_form" method="POST" action="" enctype="multipart/form-data">
+        <p>
+            No results text: 
+            <input type="text" name="no_result" />
+        </p>
+
+        <input type="submit" name="submit" value="Save">
+
+    </form>
 
     <!-- Insert table here -->
 

@@ -1,4 +1,4 @@
-var map;
+var map, myParser, userMarker, check;
 
 //when the document is ready, call this initialization function for the map
 google.maps.event.addDomListener(window, 'load', initialize);
@@ -14,6 +14,10 @@ function initialize() {
   map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 
   codeAddress();
+
+  if(!check) {
+    jQuery('#geo_text').html(no_result);
+  }
 }
 
 function codeAddress() {
@@ -28,21 +32,29 @@ function codeAddress() {
 
       var userLocation = new google.maps.LatLng(lat,lng);
 
-      var userMarker = new google.maps.Marker({
+      userMarker = new google.maps.Marker({
           position: userLocation,
           map: map,
-          title:"Your Location",
           draggable: true
       });
 
       for(file in files) {
-        var kmlLayer = new google.maps.KmlLayer("https://dl.dropboxusercontent.com/s/x7k7ckm51e244zj/file1.kml?dl=1&token_hash=AAEFsp1590_nM0BwWpwzJ2zTq78u9O7Iw3JjMYuLyKliNA");
-        kmlLayer.setMap(map);
-
-        var markerOut = google.maps.geometry.poly.containsLocation(userMarker.getPosition(), kmlLayer);
-        //console.log(markerOut);
+        if(files[file]['url'].length > 0) {
+          console.log(files[file]['url']);
+          myParser = new geoXML3.parser({map: map, afterParse: test});
+          myParser.parse(files[file]['url']);
+        }
       }
 
     }
   });
+}
+
+function test(geoxml) {
+
+  if(geoxml[0].bounds.contains(userMarker.position)) {
+    jQuery('#geo_text').html('<a href="'+files[file]['link']+'">'+files[file]['text']+'</a>');
+    check = true;
+  }
+
 }

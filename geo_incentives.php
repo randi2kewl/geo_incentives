@@ -33,11 +33,14 @@
 */
 function init_js_and_css_files() {
 
-	wp_register_script( 'google', "https://maps.googleapis.com/maps/api/js?libraries=geometry,visualization&sensor=false&v=3&key=AIzaSyDVCGFuZZWzA2lgRQztNEJExpiRDCzaj0A" );
+	wp_register_script( 'google', "https://maps.googleapis.com/maps/api/js?libraries=geometry,visualization&sensor=false&v=3" );
 	wp_enqueue_script( 'google' );
 
 	wp_register_script( 'jquery', "//code.jquery.com/jquery-1.10.2.min.js" );
 	wp_enqueue_script( 'jquery' );
+
+	wp_register_script( 'geoxml', plugins_url('geoxml.js', __FILE__) );
+	wp_enqueue_script( 'geoxml' );
 
 	wp_register_script( 'geo_incentives', plugins_url('geo_incentives.js', __FILE__) );
 	wp_enqueue_script( 'geo_incentives' );
@@ -51,30 +54,23 @@ add_action('init', 'init_js_and_css_files');
 */
 function start_geo_incentives() {
 	$json = array();
+
+	//get the files
+	$files = get_option('geo_incentive_files');
 	
 	//if there are any request params then show the form
 	if(isset($_REQUEST['address'])) {
-		$files = array(plugins_url("kml/file1.kml", __FILE__));
 
-		foreach($files as $file) {
-			$xml = simplexml_load_file($file);
-	        $childs = $xml->Document->Folder->children();
-
-	        // Cycle through each of the polygon containers
-	        foreach ($childs as $child)
-	        {
-	            $coords = $child->MultiGeometry->Polygon->outerBoundaryIs->LinearRing->coordinates[0][0];
-	            var_dump($coords);
-	            break;
-	            
-	        }
-		}
-
+		//send back the list of file urls
 		$files = json_encode($files);
 ?>
 
-	<div id='map-canvas' style="width: 800px; height: 800px;"></div>
-	<script>addy=<?php echo "'{$_REQUEST['address']}'"; ?>; files=<?php echo $files; ?>;</script>
+	<div id='map-canvas' style="display:none;"></div>
+	<script>
+		addy=<?php echo "'{$_REQUEST['address']}'"; ?>; 
+		files=<?php echo $files; ?>;
+		no_result=<?php echo "'".get_option("geo_no_result")."'"; ?>;
+	</script>
 
 <?php
 
@@ -82,22 +78,14 @@ function start_geo_incentives() {
 	
 	//create form to get address
 	$current_page_url = get_permalink();
-	echo "<form action='{$current_page_url}' method='POST'>"
+	echo "<form action='{$current_page_url}' method='GET'>"
 			."<div><input name='address' type='' placeholder='Address'/><br><br>"
 			."<input type='submit' value='submit'/></div>"
 		."</form><div id='result_text'></div>";
 
 	if(isset($_REQUEST['address'])) {
-		if(strstr($_REQUEST['address'], 'atlanta') || strstr($_REQUEST['address'], 'buckhead')) {
-			echo "<br><br><p style=''>Currently there are tax credits available in your.</p>";
-			echo "<a href='http://www.investatlanta.com'>More information</a>";
-		} else {
-			echo "<br><br><p style=''>Currently no tax credits for your area.</p>";
-			echo "<a href='http://www.investatlanta.com'>Contact Invest Atlanta</a>";
-		}
+		echo "<p id='geo_text'></p>";
 	}
-
-
 }
 
 add_shortcode( 'geo_incentives', 'start_geo_incentives' );
